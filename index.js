@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
         else{
             usernames.push(username);
             users[username] = {color: Math.floor(Math.random()*16777215).toString(16)};
+            console.log(username, ' has connected');
             socket.emit('user set', username);
         }
     });
@@ -32,8 +33,16 @@ io.on('connection', (socket) => {
         console.log('a user disconnected');
     }    
     );
+    
+    socket.on('typing', (data) => {
+        socket.broadcast.emit("typing", data);
+      })
 });
+
+
+
 
 http.listen(3000, () => {
     console.log('listening on *:3000');
 })
+

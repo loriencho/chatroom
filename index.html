@@ -13,20 +13,25 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: rgb(58, 56, 56); }
       #messages li:nth-child(even) { background:rgb(75, 72, 72); }
+      #typingBox {color:white; padding: 5px 10px;}
 
     </style>
   </head>
   <body>
     <ul id="messages"></ul>
+      <p id= "typingBox"></p>
     <form action="">
       <input id="m" autocomplete="off" placeholder="Choose a username" /><button>Submit</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script src = "https://code.jquery.com/jquery-3.4.1.min.js"> </script>
     <script> 
+
       $(function () {
       const socket = io();
-      var username =  "";
+      let username =  "";
+      let typing=false;
+      let timeout = undefined;
 
       // set username 
       $('form').submit(function(e){
@@ -48,6 +53,7 @@
       })
       socket.on('user set', (name) => {
         username = name;
+        socket.emit('send chat message', {user: username, msg: "Joined chat."});
         $('#uform').attr('id', 'mform')
         $('#m').attr('placeholder', 'Start typing a message....')
       })
@@ -57,10 +63,32 @@
         $('#messages').append(`<li style="color:#${data.color};"><strong>${data.user}: </strong> ${data.msg} </li>`);
 
       });
-      socket.on('disconnect', () => {
-        $('#messages').append($('<li>').text($('#m').val() + ' has left the chat'));
-      })
-    });
+      socket.on('disconnect', (data) => {
+        $('#messages').append($('<li style="color:#82E0FF">').text($('#m').val() + ' has left the chat'));
+        socket.emit('send chat message', {user: username, msg: "Left chat."});
+      });
+          
+      const input = document.getElementById('m');
+      const typingBox = document.getElementById('typingBox');
+
+      input.addEventListener('input', (e) => {
+          console.log(username);
+          if (username.equals("")) {
+              socket.emit("typing", {
+                  isTyping: input.value.length > 0,
+                  name: username,
+              });
+          }
+      });
+                             
+      socket.on("typing", (data) => {
+         if (data.isTyping) {
+            typingBox.innerHTML = '${data.name} is typing...';
+         } else {
+            typingBox.innerHTML = '';
+         }
+     })
+      });
 
     
     </script>
