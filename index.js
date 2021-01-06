@@ -6,25 +6,25 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html', __dirname + '/main.js');
 });
 
-users = [];
+let users = {};
+let usernames = [];
 
 io.on('connection', (socket) => {
     let d = new Date();
-    
-    const userid = `${d.getHours()}${d.getMinutes()}${d.getSeconds()}`;
 
     io.emit('a user connected');
     socket.on('send chat message', (data) =>{
         console.log(data);
-        io.emit('receive chat message', data);
+        io.emit('receive chat message', {user: data.user, msg:data.msg, color:users[data.user].color});
     });
     socket.on('add user', (username) =>{
-        if(users.indexOf(username) > -1){
+        
+        if(usernames.indexOf(username) > -1){
             socket.emit('user exists', username);
         }
         else{
-            console.log("User added " + username);
-            users.push(username);
+            usernames.push(username);
+            users[username] = {color: Math.floor(Math.random()*16777215).toString(16)};
             socket.emit('user set', username);
         }
     });
