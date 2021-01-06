@@ -16,23 +16,52 @@
   <body>
     <ul id="messages"></ul>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+      <input id="m" autocomplete="off" placeholder="Choose a username" /><button>Submit</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script src = "https://code.jquery.com/jquery-3.4.1.min.js"> </script>
-    <script>
+    <script> 
       $(function () {
-        const socket = io();
-        $('form').submit(function(e){
-          e.preventDefault(); // prevents page reloading
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-        });
+      const socket = io();
+      var username =  "";
+
+      // set username 
+      $('form').submit(function(e){
+        e.preventDefault(); // prevents page reloading
+
+        if(username == ""){
+          socket.emit('add user', $('#m').val());
+
+        }
+        else{
+          socket.emit('send chat message', {user: username, msg: $('#m').val()});
+        }
+        $('#m').val('');
       });
+
+      socket.on('user exists', (name) =>{
+        $('#m').attr('placeholder', 'Username already exists. Please try again.')
+
+      })
+      socket.on('user set', (name) => {
+        username = name;
+        $('#uform').attr('id', 'mform')
+        $('#m').attr('placeholder', 'Start typing a message....')
+
+        console.log("mform");
+      })
+
+      socket.on('receive chat message', (data) =>{
+        console.log(data);
+        $('#messages').append(`<li><strong>${data.user}: </strong> ${data.msg} </li>`);
+
+      });
+      socket.on('disconnect', () => {
+        $('#messages').append($('<li>').text($('#m').val() + ' has left the chat'));
+      })
+    });
+
+    
     </script>
 
   </body>
