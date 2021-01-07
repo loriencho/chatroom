@@ -27,68 +27,65 @@
     <script src = "https://code.jquery.com/jquery-3.4.1.min.js"> </script>
     <script> 
 
-      $(function () {
-      const socket = io();
-      let username =  "";
-      let typing=false;
-      let timeout = undefined;
+        $(function () {
+        const socket = io();
+        let username =  "";
+        let typing=false;
+        let timeout = undefined;
 
-      // set username 
-      $('form').submit(function(e){
-        e.preventDefault(); // prevents page reloading
+        // set username 
+        $('form').submit(function(e){
+          e.preventDefault(); // prevents page reloading
 
-        if(username == ""){
-          socket.emit('add user', $('#m').val());
+          if(username == ""){
+            socket.emit('add user', $('#m').val());
 
-        }
-        else{
-          socket.emit('send chat message', {user: username, msg: $('#m').val()});
-        }
-        $('#m').val('');
-      });
-
-      socket.on('user exists', (name) =>{
-        $('#m').attr('placeholder', 'Username already exists. Please try again.')
-
-      })
-      socket.on('user set', (name) => {
-        username = name;
-        socket.emit('send chat message', {user: username, msg: "Joined chat."});
-        $('#uform').attr('id', 'mform')
-        $('#m').attr('placeholder', 'Start typing a message....')
-      })
-
-      socket.on('receive chat message', (data) =>{
-        console.log(data);
-        $('#messages').append(`<li style="color:#${data.color};"><strong>${data.user}: </strong> ${data.msg} </li>`);
-
-      });
-      socket.on('disconnect', (data) => {
-        $('#messages').append($('<li style="color:#82E0FF">').text($('#m').val() + ' has left the chat'));
-        socket.emit('send chat message', {user: username, msg: "Left chat."});
-      });
-          
-      const input = document.getElementById('m');
-      const typingBox = document.getElementById('typingBox');
-
-      input.addEventListener('input', (e) => {
-          console.log(username);
-          if (username.equals("")) {
-              socket.emit("typing", {
-                  isTyping: input.value.length > 0,
-                  name: username,
-              });
           }
-      });
-                             
-      socket.on("typing", (data) => {
-         if (data.isTyping) {
-            typingBox.innerHTML = '${data.name} is typing...';
-         } else {
-            typingBox.innerHTML = '';
-         }
-     })
-      });
+          else{
+            socket.emit('send chat message', {user: username, msg: $('#m').val()});
+          }
+          $('#m').val('');
+        });
+
+        socket.on('user exists', (name) =>{
+          $('#m').attr('placeholder', 'Username already exists. Please try again.')
+
+        })
+        socket.on('user set', (name) => {
+          username = name;
+          socket.emit('send chat message', {user: username, msg: "Joined chat."});
+          $('#uform').attr('id', 'mform')
+          $('#m').attr('placeholder', 'Start typing a message....')
+        })
+
+        socket.on('receive chat message', (data) =>{
+          console.log(data);
+          $('#messages').append(`<li style="color:hsl(${data.color}, 50%, 70%);"><strong>${data.user}: </strong> ${data.msg} </li>`);
+
+        });
+            
+        const input = document.getElementById('m');
+        const typingBox = document.getElementById('typingBox');
+
+        input.addEventListener('input', (e) => {
+            console.log(username);
+            if (username.equals("")) {
+                socket.emit("typing", {
+                    isTyping: input.value.length > 0,
+                    name: username,
+                });
+            }
+        });
+                              
+        socket.on("typing", (data) => {
+          if (data.isTyping) {
+              typingBox.innerHTML = '${data.name} is typing...';
+          } else {
+              typingBox.innerHTML = '';
+          }
+      })
+      
+    });
 
     
     </script>

@@ -14,7 +14,6 @@ io.on('connection', (socket) => {
 
     io.emit('a user connected');
     socket.on('send chat message', (data) =>{
-        console.log(data);
         io.emit('receive chat message', {user: data.user, msg:data.msg, color:users[data.user].color});
     });
     socket.on('add user', (username) =>{
@@ -23,14 +22,19 @@ io.on('connection', (socket) => {
             socket.emit('user exists', username);
         }
         else{
+            socket.username = username;
             usernames.push(username);
-            users[username] = {color: Math.floor(Math.random()*16777215).toString(16)};
+            users[username] = {color: Math.floor(Math.random()*357).toString()};
             console.log(username, ' has connected');
             socket.emit('user set', username);
         }
     });
     socket.on('disconnect', () =>{
-        console.log('a user disconnected');
+        console.log(socket.username + ' disconnected');
+        io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
+        usernames.splice(usernames.indexOf(socket.username), 1);
+        delete users[socket.username];
+        console.log(users)
     }    
     );
     
