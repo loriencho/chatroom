@@ -66,24 +66,45 @@
             
         const input = document.getElementById('m');
         const typingBox = document.getElementById('typingBox');
+        let type = false;
+        let to = undefined;
+                    
 
         input.addEventListener('input', (e) => {
-            console.log(username);
-            if (username.equals("")) {
-                socket.emit("typing", {
+            if (username.length > 0) {
+                
+                if (type == false) {
+                    type = true;
+                    socket.emit("typing", {
                     isTyping: input.value.length > 0,
                     name: username,
                 });
-            }
+                    to = setTimeout(timedOut, 1500);
+                } else {
+                    clearTimeout(to);
+                    to = setTimeout(timedOut, 1500);
+
+                }
+2            }
         });
+            
+        function timedOut() {
+            type = false;
+            socket.emit("typing", {
+                    isTyping: type,
+                    name: username,
+                });
+        }
                               
         socket.on("typing", (data) => {
+          console.log("Hey");
           if (data.isTyping) {
-              typingBox.innerHTML = '${data.name} is typing...';
+              typingBox.innerHTML = data.name.concat('is typing...');
           } else {
-              typingBox.innerHTML = '';
+            typingBox.innerHTML = "";
+
           }
-      })
+      }) 
       
     });
 

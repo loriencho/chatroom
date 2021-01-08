@@ -34,12 +34,12 @@ io.on('connection', (socket) => {
         io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
         usernames.splice(usernames.indexOf(socket.username), 1);
         delete users[socket.username];
-        console.log(users)
+        console.log(users);
     }    
     );
     
     socket.on('typing', (data) => {
-        socket.broadcast.emit("typing", data);
+        socket.broadcast.emit('typing', data);
       })
 });
 
@@ -49,4 +49,8 @@ io.on('connection', (socket) => {
 http.listen(process.env.PORT || 3000, () => {
     console.log('listening on *:3000');
 })
+
+//http.listen(3000, () => {
+//    console.log('listening on *:3000');
+//})
 
