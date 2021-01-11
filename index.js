@@ -8,6 +8,7 @@ app.get('/', (req, res) => {
 
 let users = {};
 let usernames = [];
+let usersTyping = [];
 
 io.on('connection', (socket) => {
     let d = new Date();
@@ -39,6 +40,14 @@ io.on('connection', (socket) => {
     );
     
     socket.on('typing', (data) => {
+//        if (data.isTyping) {
+//            if (usersTyping.indexOf(data.name) > -1) {
+//                socket.broadcast.emit('typing', data);
+//
+//            }
+//        }
+//        }
+//        usersTyping.push(data.name);
         socket.broadcast.emit('typing', data);
       })
 });
