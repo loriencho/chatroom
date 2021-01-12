@@ -40,15 +40,17 @@ io.on('connection', (socket) => {
     );
     
     socket.on('typing', (data) => {
-//        if (data.isTyping) {
-//            if (usersTyping.indexOf(data.name) > -1) {
-//                socket.broadcast.emit('typing', data);
-//
-//            }
-//        }
-//        }
-//        usersTyping.push(data.name);
-        socket.broadcast.emit('typing', data);
+        if (usersTyping.indexOf(data.name) == -1) {
+            if (data.isTyping) {
+                usersTyping.push(data.name);
+            }
+                         
+        } else {
+            if (!data.isTyping) {
+                usersTyping.splice(usersTyping.indexOf(data.name), 1); 
+            }
+        }
+        socket.broadcast.emit('typing', usersTyping);
       })
 });
 
@@ -59,7 +61,4 @@ http.listen(process.env.PORT || 3000, () => {
     console.log('listening on *:3000');
 })
 
-//http.listen(3000, () => {
-//    console.log('listening on *:3000');
-//})
 

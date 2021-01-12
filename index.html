@@ -23,7 +23,7 @@
         <ul id="messages"></ul>
           <p id= "typingBox"></p>
         <form action="">
-          <input id="m" autocomplete="off" placeholder="Choose a username" /><button>Submit</button>
+          <input id="m" autocomplete="off" placeholder="Choose a username" maxlength="25"/><button>Submit</button>
         </form>
       </div>
     <script src="/socket.io/socket.io.js"></script>
@@ -35,6 +35,8 @@
         let username =  "";
         let typing=false;
         let timeout = undefined;
+        const input = document.getElementById('m');
+        input.maxlength = "";
 
         // set username 
         $('form').submit(function(e){
@@ -67,7 +69,6 @@
 
         });
             
-        const input = document.getElementById('m');
         const typingBox = document.getElementById('typingBox');
         let type = false;
         let to = undefined;
@@ -100,13 +101,22 @@
         }
                               
         socket.on("typing", (data) => {
-          console.log("Hey");
-          if (data.isTyping) {
-              typingBox.innerHTML = data.name.concat('is typing...');
-          } else {
-            typingBox.innerHTML = "";
-
-          }
+          if (data.length > 0) {
+              if (data.length == 1) {
+                typingBox.innerHTML = data[0].concat('is typing...');
+              }
+              else if (data.length == 2) {
+                typingBox.innerHTML = data[0].concat(' and ').concat(data[1].concat(" are typing..."));
+              } 
+              else if (data.length == 3) {
+                typingBox.innerHTML = [data[0], ", ", data[1], ", and ", data[2], " are typing..."].join();
+              } else {
+                typingBox.innerHTML = "Several users are typing...";
+              }
+          } 
+          else {
+                  typingBox.innerHTML = "";
+              }
       }) 
       
     });
