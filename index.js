@@ -29,12 +29,15 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('disconnect', () =>{
+        if (usersTyping.indexOf(socket.username)!= -1) {
+            usersTyping.splice(usersTyping.indexOf(socket.username), 1); 
+            socket.broadcast.emit('typing', usersTyping);
+        }
         console.log(socket.username + ' disconnected');
         io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
         usernames.splice(usernames.indexOf(socket.username), 1);
         io.emit('user removed', socket.username);
         delete users[socket.username];
-        console.log(users);
     }    
     );
     
