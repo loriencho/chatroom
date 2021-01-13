@@ -10,14 +10,14 @@
       form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; color:white}
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       strong {background: none; font: 20px}
-      #messages { list-style-type: none; margin: 0; padding: 0;}
-      #messages li { padding: 8px 10px; }
-      #messages li:nth-child(odd) { background: rgb(58, 56, 56); }
-      #messages li:nth-child(even) { background:rgb(75, 72, 72); }
+      #messages {margin: 0; padding: 0;}
+      li { list-style-type: none; padding: 8px 10px; }
+      li:nth-child(odd) { background: rgb(58, 56, 56); }
+      li:nth-child(even) { background:rgb(75, 72, 72); }
       #typingBox {color:white; padding: 5px 10px;}
       .menu{display: flex; flex-direction: column; border:1px solid black}
       #chatbox {width:50%; top:0; height: 80%; overflow:auto;}
-      #side-display {width:25%; height:15%} 
+      #user-display {width:25%; height:15%} 
       #content {padding:5%; display: flex; flex-direction: row; justify-content:center; width:100%; height:100%;}; 
     </style>
   </head>
@@ -30,7 +30,7 @@
           <input id="m" autocomplete="off" placeholder="Choose a username" maxlength="25"/><button>Submit</button>
         </form>
       </div>
-      <div id="side-display" class="menu"> </div>
+      <div id="user-display" class="menu"> <strong style="color: white; font-size:15px; padding: 8px 10px;">Users</strong></div>
     </div>
       <script src="/socket.io/socket.io.js"></script>
     <script src = "https://code.jquery.com/jquery-3.4.1.min.js"> </script>
@@ -58,15 +58,31 @@
           $('#m').val('');
         });
 
+        socket.on('receive user list', (data)=>{
+          let i; 
+          for(i = 0; i < data.userlist.length; i++){
+            $('#user-display').append(`<li id="${data.userlist[i]}" style="color:hsl(${data.userdata[data.userlist[i]].color}, 50%, 70%);">${data.userlist[i]}</li>`);
+          }
+
+        });
         socket.on('user exists', (name) =>{
           $('#m').attr('placeholder', 'Username already exists. Please try again.')
 
-        })
+        });
         socket.on('user set', (name) => {
           username = name;
           socket.emit('send chat message', {user: username, msg: "Joined chat."});
           $('#uform').attr('id', 'mform')
           $('#m').attr('placeholder', 'Start typing a message....')
+        });
+
+        socket.on('user added', (data)=> {
+          $('#user-display').append(`<li id="${data.user}"style="color:hsl(${data.color}, 50%, 70%);">${data.user}</li>`)
+          
+        });
+
+        socket.on('user removed', (username)=>{
+          $(`#${username}`).remove();
         })
 
         socket.on('receive chat message', (data) =>{

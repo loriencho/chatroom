@@ -11,9 +11,7 @@ let usernames = [];
 let usersTyping = [];
 
 io.on('connection', (socket) => {
-    let d = new Date();
-
-    io.emit('a user connected');
+    socket.emit('receive user list', {userlist:usernames, userdata:users})
     socket.on('send chat message', (data) =>{
         io.emit('receive chat message', {user: data.user, msg:data.msg, color:users[data.user].color});
     });
@@ -26,14 +24,15 @@ io.on('connection', (socket) => {
             socket.username = username;
             usernames.push(username);
             users[username] = {color: Math.floor(Math.random()*357).toString()};
-            console.log(username, ' has connected');
             socket.emit('user set', username);
+            io.emit('user added', {user:socket.username, color:users[username].color})
         }
     });
     socket.on('disconnect', () =>{
         console.log(socket.username + ' disconnected');
         io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
         usernames.splice(usernames.indexOf(socket.username), 1);
+        io.emit('user removed', socket.username);
         delete users[socket.username];
         console.log(users);
     }    
