@@ -73,13 +73,12 @@
         socket.on('user set', (name) => {
           username = name;
           socket.emit('send chat message', {user: username, msg: "Joined chat."});
-          $('#uform').attr('id', 'mform')
-          $('#m').attr('placeholder', 'Start typing a message....')
+          $('#uform').attr('id', 'mform');
+          $('#m').attr('placeholder', 'Start typing a message....');
         });
 
         socket.on('user added', (data)=> {
           $('#user-display').append(`<li id="${data.user}"style="color:hsl(${data.color}, 50%, 70%);">${data.user}</li>`)
-          
         });
 
         socket.on('user removed', (username)=>{
@@ -88,6 +87,10 @@
 
         socket.on('receive chat message', (data) =>{
           $('#messages').append(`<li style="color:hsl(${data.color}, 50%, 70%);"><strong>${data.user}: </strong> ${data.msg} </li>`);
+          console.log("TEST");
+          console.log($('#chatbox').scrollTop);
+          console.log ($('#chatbox').scrollHeight);
+          $('#chatbox').prop('scrollTop', $('#chatbox').prop('scrollHeight'));
 
         });
             
