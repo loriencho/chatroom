@@ -52,6 +52,7 @@ io.on('connection', (socket) => {
                 usersTyping.splice(usersTyping.indexOf(data.name), 1); 
             }
         }
+        
         socket.broadcast.emit('typing', usersTyping);
       })
 });
