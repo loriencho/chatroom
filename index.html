@@ -57,7 +57,7 @@
 
           if(username == ""){
             input.setAttribute("maxlength", "1500");
-            socket.emit('add user', $('#m').val());
+            socket.emit('add user', $('#m').val().trim());
 
           }
           else{
