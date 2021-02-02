@@ -9,7 +9,7 @@
       form {padding: 3px; bottom: 19%; width: 45%; border:1px solid black; border-radius: 5px; margin-top: 2%; position:fixed;}
       form input { border: 0; padding: 10px; width: 100%; margin-right: 0.5%; color: white;}
       strong {background: none; font: 20px}
-      #messages {margin: 0; padding: 0; word-wrap: break-word;}
+      #messages {margin: 0; padding: 0; word-wrap: break-word; word-wrap: anywhere; overflow-wrap: anywhere}
       li { list-style-type: none; padding: 8px 10px; }
       li:nth-child(odd) {}
       li:nth-child(even) { background:rgb(75, 72, 72); }
@@ -34,7 +34,10 @@
 
 
 
-      <div id="user-display" class="menu"> <strong style="color: white; font-size:15px; padding: 8px 10px; background: rgb(120, 111, 110);">Users</strong></div>
+      <div id="user-display" class="menu"> 
+        <strong style="color: white; font-size:15px; padding: 8px 10px; background: rgb(120, 111, 110);">Users</strong>
+        <ul id="userlist"></ul>
+      </div>
     </div>
       <script src="/socket.io/socket.io.js"></script>
     <script src = "https://code.jquery.com/jquery-3.4.1.min.js"> </script>
@@ -65,10 +68,12 @@
           $('#m').val('');
         });
 
-        socket.on('receive user list', (data)=>{
+        socket.on('receive userlist', (data)=>{
+          print("test");
+          $('#userlist').empty();
           let i; 
           for(i = 0; i < data.userlist.length; i++){
-            $('#user-display').append(`<li id="${data.userlist[i]}" style="color:hsl(${data.userdata[data.userlist[i]].color}, 50%, 70%);">${data.userlist[i]}</li>`);
+            $('#userlist').append(`<li style="color:hsl(${data.userdata[data.userlist[i]].color}, 50%, 70%);">${data.userlist[i]}</li>`);
           }
 
         });
@@ -82,14 +87,6 @@
           $('#uform').attr('id', 'mform');
           $('#m').attr('placeholder', 'Start typing a message....');
         });
-
-        socket.on('user added', (data)=> {
-          $('#user-display').append(`<li id="${data.user}"style="color:hsl(${data.color}, 50%, 70%);">${data.user}</li>`)
-        });
-
-        socket.on('user removed', (username)=>{
-          $(`#${username}`).remove();
-        })
 
         socket.on('receive chat message', (data) =>{
           $('#messages').append(`<li style="color:hsl(${data.color}, 50%, 70%);"><strong>${data.user}: </strong> ${data.msg} </li>`);

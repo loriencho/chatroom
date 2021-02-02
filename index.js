@@ -11,7 +11,9 @@ let usernames = [];
 let usersTyping = [];
 
 io.on('connection', (socket) => {
-    socket.emit('receive user list', {userlist:usernames, userdata:users})
+    socket.joined = false; 
+    socket.emit('receive userlist', {userlist:usernames, userdata:users});
+
     socket.on('send chat message', (data) =>{
         io.emit('receive chat message', {user: data.user, msg:data.msg, color:users[data.user].color});
     });
@@ -21,23 +23,26 @@ io.on('connection', (socket) => {
             socket.emit('user exists', username);
         }
         else{
+            socket.joined = true;
             socket.username = username;
             usernames.push(username);
             users[username] = {color: Math.floor(Math.random()*357).toString()};
             socket.emit('user set', username);
-            io.emit('user added', {user:socket.username, color:users[username].color})
+            io.emit('receive userlist', {userlist:usernames, userdata:users});
         }
     });
     socket.on('disconnect', () =>{
-        if (usersTyping.indexOf(socket.username)!= -1) {
-            usersTyping.splice(usersTyping.indexOf(socket.username), 1); 
-            socket.broadcast.emit('typing', usersTyping);
+        if (socket.joined){
+            if (usersTyping.indexOf(socket.username)!= -1) {
+                usersTyping.splice(usersTyping.indexOf(socket.username), 1); 
+                socket.broadcast.emit('typing', usersTyping);
+            }
+            console.log(socket.username + ' disconnected');
+            io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
+            usernames.splice(usernames.indexOf(socket.username), 1);
+            delete users[socket.username];
+            io.emit('receive userlist', {userlist:usernames, userdata:users})
         }
-        console.log(socket.username + ' disconnected');
-        io.emit('receive chat message', {user: socket.username, msg:"Left chat.", color:users[socket.username].color});
-        usernames.splice(usernames.indexOf(socket.username), 1);
-        io.emit('user removed', socket.username);
-        delete users[socket.username];
     }    
     );
     
