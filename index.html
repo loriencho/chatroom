@@ -69,7 +69,6 @@
         });
 
         socket.on('receive userlist', (data)=>{
-          print("test");
           $('#userlist').empty();
           let i; 
           for(i = 0; i < data.userlist.length; i++){
