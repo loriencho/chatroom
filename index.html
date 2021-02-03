@@ -55,10 +55,14 @@
         $('form').submit(function(e){
           e.preventDefault(); // prevents page reloading
 
-          if(username == ""){
-            input.setAttribute("maxlength", "1500");
-            socket.emit('add user', $('#m').val().trim());
-
+          if(username.length == 0){
+              if ($('#m').val().trim() == "") {
+                $('#m').attr('placeholder', "No username entered. Please try again.");
+              } 
+              else {
+                input.setAttribute("maxlength", "1500");
+                socket.emit('add user', $('#m').val().trim());
+              }
           }
           else{
               if ($('#m').val().length > 0) {
